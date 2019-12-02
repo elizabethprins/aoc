@@ -2,6 +2,7 @@ module Main exposing (Model, Msg(..), init, main, update, view)
 
 import Browser
 import Day1
+import Day2
 import Html exposing (..)
 import Html.Attributes exposing (style)
 
@@ -19,12 +20,12 @@ main =
 
 
 type alias Model =
-    Int
+    { showDay2Part2 : Bool }
 
 
 init : Model
 init =
-    0
+    { showDay2Part2 = False }
 
 
 
@@ -33,6 +34,7 @@ init =
 
 type Msg
     = NoOp
+    | ToggleDay2Part2
 
 
 update : Msg -> Model -> Model
@@ -40,6 +42,9 @@ update msg model =
     case msg of
         NoOp ->
             model
+
+        ToggleDay2Part2 ->
+            { model | showDay2Part2 = not model.showDay2Part2 }
 
 
 
@@ -54,6 +59,7 @@ view model =
         , style "margin" "0 auto"
         , style "color" "#313131"
         ]
-        [ h1 [] [ text "AoC 2019" ]
+        [ h1 [] [ text "AoC 2019 🎄" ]
         , Day1.view
+        , Day2.view ToggleDay2Part2 model.showDay2Part2
         ]

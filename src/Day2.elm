@@ -7,8 +7,8 @@ import Html.Events exposing (onClick)
 import Set exposing (..)
 
 
-view : msg -> Bool -> Html msg
-view togglePart2 showPart2 =
+view : Html msg
+view =
     article []
         [ h2 [] [ text "Day 2" ]
         , p []
@@ -20,21 +20,11 @@ view togglePart2 showPart2 =
             ]
         , p [] [ text (String.join ", " <| Array.toList <| Array.map String.fromInt runIntCodeProgram) ]
         , p [] [ text "Answer Part 2: " ]
-        , p [] [ text "Output, noun, verb: " ]
-        , button [ onClick togglePart2 ] [ text "show result" ]
-        , viewIf showPart2 <|
-            -- causes `Uncaught RangeError: Maximum call stack size exceeded` in Chrome
-            \_ -> span [] [ text (String.join ", " <| Array.toList <| Array.map String.fromInt (runProgramToFindOutput 0)) ]
+        , p []
+            [ text "Output, noun, verb: "
+            , text (String.join ", " <| List.map String.fromInt (findMagicNumber 0 0))
+            ]
         ]
-
-
-viewIf : Bool -> (() -> Html msg) -> Html msg
-viewIf bool html =
-    if bool then
-        html ()
-
-    else
-        text ""
 
 
 
@@ -85,7 +75,11 @@ calculateOutput currentPos function program =
 
 setOutputValue : ( Int, Int, Int ) -> (Int -> Int -> Int) -> Array Int -> Array Int
 setOutputValue ( inputPos1, inputPos2, outputPos ) function program =
-    case ( Array.get inputPos1 program, Array.get inputPos2 program ) of
+    case
+        ( Array.get inputPos1 program
+        , Array.get inputPos2 program
+        )
+    of
         ( Just inputValue1, Just inputValue2 ) ->
             Array.set outputPos (function inputValue1 inputValue2) program
 
@@ -97,41 +91,30 @@ setOutputValue ( inputPos1, inputPos2, outputPos ) function program =
 -- PART 2
 
 
-runProgramToFindOutput : Int -> Array Int
-runProgramToFindOutput index =
-    let
-        maybeCombo =
-            Array.get index nounAndVerbCombos
-    in
-    case maybeCombo of
-        Just ( noun, verb ) ->
-            findMagicNumber index noun verb
-
-        _ ->
-            Array.fromList []
-
-
-findMagicNumber : Int -> Int -> Int -> Array Int
-findMagicNumber index noun verb =
+findMagicNumber : Int -> Int -> List Int
+findMagicNumber noun verb =
     case
-        Array.get 0
-            (runOpcode 0 <|
-                Array.set 2 verb <|
-                    Array.set 1 noun intcodeProgram
-            )
+        Array.set 1 noun intcodeProgram
+            |> Array.set 2 verb
+            |> runOpcode 0
+            |> Array.get 0
     of
         Just 19690720 ->
-            Array.fromList [ 19690720, noun, verb ]
+            [ 19690720, noun, verb ]
 
-        _ ->
-            runProgramToFindOutput (index + 1)
+        Just _ ->
+            let
+                ( noun_, verb_ ) =
+                    if noun <= 99 then
+                        ( noun + 1, verb )
 
+                    else
+                        ( 0, verb + 1 )
+            in
+            findMagicNumber noun_ verb_
 
-nounAndVerbCombos : Array ( Int, Int )
-nounAndVerbCombos =
-    Array.fromList <|
-        List.concatMap (\x -> List.map (Tuple.pair x) (List.range 0 99))
-            (List.range 0 99)
+        Nothing ->
+            []
 
 
 

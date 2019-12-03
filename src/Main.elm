@@ -34,7 +34,6 @@ init =
 
 type Msg
     = NoOp
-    | ToggleDay2Part2
 
 
 update : Msg -> Model -> Model
@@ -42,9 +41,6 @@ update msg model =
     case msg of
         NoOp ->
             model
-
-        ToggleDay2Part2 ->
-            { model | showDay2Part2 = not model.showDay2Part2 }
 
 
 
@@ -61,5 +57,5 @@ view model =
         ]
         [ h1 [] [ text "AoC 2019 🎄" ]
         , Day1.view
-        , Day2.view ToggleDay2Part2 model.showDay2Part2
+        , Day2.view
         ]

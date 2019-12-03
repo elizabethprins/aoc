@@ -2,9 +2,6 @@ module Day2 exposing (view)
 
 import Array exposing (..)
 import Html exposing (..)
-import Html.Attributes exposing (style)
-import Html.Events exposing (onClick)
-import Set exposing (..)
 
 
 view : Html msg
@@ -21,7 +18,7 @@ view =
         , p [] [ text (String.join ", " <| Array.toList <| Array.map String.fromInt runIntCodeProgram) ]
         , p [] [ text "Answer Part 2: " ]
         , p []
-            [ text "Output, noun, verb: "
+            [ text "Output, puzzle solution: "
             , text (String.join ", " <| List.map String.fromInt (findMagicNumber 0 0))
             ]
         ]
@@ -100,7 +97,7 @@ findMagicNumber noun verb =
             |> Array.get 0
     of
         Just 19690720 ->
-            [ 19690720, noun, verb ]
+            [ 19690720, 100 * noun + verb ]
 
         Just _ ->
             let
